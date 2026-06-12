@@ -36,6 +36,20 @@ export default function useWebRTC(roomId: string) {
 
         socket.emit("join-room", roomId);
 
+        socket.on("disconnect", (reason) => {
+          console.log(
+            "SOCKET DISCONNECTED:",
+            reason
+          );
+        });
+
+        socket.on("connect", () => {
+          console.log(
+            "SOCKET CONNECTED:",
+            socket.id
+          );
+        });
+
         socket.on("all-users", (users: string[]) => {
   console.log("ALL USERS:", users);
 
