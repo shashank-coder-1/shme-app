@@ -133,7 +133,8 @@ export default function RoomPage() {
     items-center
     justify-center
     text-white
-    p-6
+    p-3
+    md:p-6
     space-y-6
   "
 >
@@ -160,17 +161,19 @@ export default function RoomPage() {
         <div
           ref={movieContainerRef}
           className="
-            relative
-            w-[1400px]
-            h-[800px]
-            overflow-hidden
-            rounded-[40px]
-            bg-white/10
-            backdrop-blur-xl
-            border
-            border-white/30
-            shadow-[0_20px_80px_rgba(0,0,0,0.35)]
-          "
+          relative
+          w-[95vw]
+          max-w-[1400px]
+          h-[65vh]
+          md:h-[800px]
+          overflow-hidden
+          rounded-[24px]
+          md:rounded-[40px]
+          bg-white/10
+          backdrop-blur-xl
+          border
+          border-white/30
+          shadow-[0_20px_80px_rgba(0,0,0,0.35)]"
         >
 
           {/* Main Screen */}
@@ -201,13 +204,15 @@ export default function RoomPage() {
               muted
               playsInline
               className="
-                w-36
-                h-36
-                rounded-full
-                object-cover
-                border-4
-                border-white
-                shadow-[0_0_35px_rgba(255,255,255,0.4)]
+              w-20
+              h-20
+              md:w-36
+              md:h-36
+              rounded-full
+              object-cover
+              border-4
+              border-white
+              shadow-[0_0_35px_rgba(255,255,255,0.4)]
               "
             />
           </div>
@@ -219,13 +224,15 @@ export default function RoomPage() {
               autoPlay
               playsInline
               className="
-                w-36
-                h-36
-                rounded-full
-                object-cover
-                border-4
-                border-white
-                shadow-[0_0_35px_rgba(255,255,255,0.4)]
+              w-20
+              h-20
+              md:w-36
+              md:h-36
+              rounded-full
+              object-cover
+              border-4
+              border-white
+              shadow-[0_0_35px_rgba(255,255,255,0.4)]
               "
             />
           </div>
@@ -262,24 +269,30 @@ export default function RoomPage() {
         {/* Controls */}
 <div
   className="
-    flex
-    gap-3
-    p-3
-    rounded-full
-    bg-white/10
-    backdrop-blur-2xl
-    border
-    border-white/20
-    shadow-xl
-  "
+  flex
+  flex-wrap
+  justify-center
+  gap-2
+  md:gap-3
+  p-3
+  max-w-[95vw]
+  rounded-3xl
+  bg-white/10
+  backdrop-blur-2xl
+  border
+  border-white/20
+  shadow-xl
+"
 >
 
   {/* Share Screen */}
   <button
     onClick={shareScreen}
     className="
-      w-14
-      h-14
+      w-12
+      h-12
+      md:w-14
+      md:h-14
       rounded-full
       flex
       items-center
@@ -299,8 +312,10 @@ export default function RoomPage() {
     onClick={toggleMute}
     title={isMuted ? "Unmute" : "Mute"}
     className="
-      w-14
-      h-14
+      w-12
+      h-12
+      md:w-14
+      md:h-14
       rounded-full
       flex
       items-center
@@ -326,8 +341,10 @@ export default function RoomPage() {
         : "Camera Off"
     }
     className="
-      w-14
-      h-14
+      w-12
+      h-12
+      md:w-14
+      md:h-14
       rounded-full
       flex
       items-center
@@ -349,8 +366,10 @@ export default function RoomPage() {
   onClick={copyInviteLink}
   title="Copy Invite Link"
   className="
-    w-14
-    h-14
+    w-12
+    h-12
+    md:w-14
+    md:h-14
     rounded-full
     flex
     items-center
@@ -368,8 +387,10 @@ export default function RoomPage() {
     onClick={toggleFullscreen}
     title="Fullscreen"
     className="
-      w-14
-      h-14
+      w-12
+      h-12
+      md:w-14
+      md:h-14
       rounded-full
       flex
       items-center
@@ -390,8 +411,10 @@ export default function RoomPage() {
       flex
       items-center
       gap-2
-      px-6
-      py-3
+      px-4 
+      py-2
+      md:px-6 
+      md:py-3
       rounded-full
       bg-gradient-to-r
       from-rose-500
