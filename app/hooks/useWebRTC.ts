@@ -32,6 +32,8 @@ export default function useWebRTC(roomId: string) {
           localVideoRef.current.srcObject = stream;
         }
 
+        console.log("DEBUG VERSION 3");
+
         socket.emit("join-room", roomId);
 
         socket.on("all-users", (users: string[]) => {
@@ -160,7 +162,10 @@ export default function useWebRTC(roomId: string) {
             peerRef.current = peer;
         });
 
-        socket.on("receiving-signal", (payload) => {
+        socket.on("receiving-signal",(payload: {
+          signal: any;
+          callerId: string;
+        }) => {
     console.log(
       "RECEIVED SIGNAL",
       payload
