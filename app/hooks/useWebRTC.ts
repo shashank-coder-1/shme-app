@@ -165,9 +165,12 @@ export default function useWebRTC(roomId: string) {
         socket.on("receiving-signal", (payload) => {
   console.log("RECEIVED SIGNAL", payload);
 
-  if (peerRef.current) {
+  if (
+    peerRef.current &&
+    (peerRef.current as any)._connected
+  ) {
     console.log(
-      "Peer already exists"
+      "Already connected"
     );
     return;
   }
@@ -178,20 +181,9 @@ export default function useWebRTC(roomId: string) {
     stream
   );
 
-  peer.on("stream", (remoteStream) => {
-    console.log(
-      "REMOTE STREAM RECEIVED"
-    );
-
-    if (mainScreenRef.current) {
-      mainScreenRef.current.srcObject =
-        remoteStream;
-    }
-
-    if (partnerVideoRef.current) {
-      partnerVideoRef.current.srcObject =
-        remoteStream;
-    }
+  peer.on("connect", () => {
+    console.log("PEER CONNECTED");
+    (peer as any)._connected = true;
   });
 
   peerRef.current = peer;
