@@ -61,7 +61,20 @@ export default function useWebRTC(roomId: string) {
     );
 
     peer.on("stream", (remoteStream) => {
-      console.log("REMOTE STREAM RECEIVED");
+      console.log(
+  "REMOTE STREAM TRACKS:",
+  remoteStream.getTracks()
+);
+
+console.log(
+  "VIDEO TRACKS:",
+  remoteStream.getVideoTracks()
+);
+
+console.log(
+  "AUDIO TRACKS:",
+  remoteStream.getAudioTracks()
+);
 
       if (mainScreenRef.current) {
         mainScreenRef.current.srcObject =
@@ -111,8 +124,17 @@ export default function useWebRTC(roomId: string) {
   );
 
   if (mainScreenRef.current) {
-    mainScreenRef.current.srcObject =
-      remoteStream;
+    mainScreenRef.current.srcObject = remoteStream;
+    mainScreenRef.current.onloadedmetadata =
+    () => {
+    console.log(
+      "MAIN VIDEO LOADED"
+    );
+
+    mainScreenRef.current
+      ?.play()
+      .catch(console.error);
+  };
 
     mainScreenRef.current
       .play()
@@ -148,7 +170,17 @@ export default function useWebRTC(roomId: string) {
 
   if (partnerVideoRef.current) {
     partnerVideoRef.current.srcObject =
-      remoteStream;
+    remoteStream;
+    partnerVideoRef.current.onloadedmetadata =
+    () => {
+    console.log(
+      "PARTNER VIDEO LOADED"
+    );
+
+    partnerVideoRef.current
+      ?.play()
+      .catch(console.error);
+  };
 
     partnerVideoRef.current
       .play()
@@ -179,13 +211,8 @@ export default function useWebRTC(roomId: string) {
         socket.on("receiving-signal", (payload) => {
   console.log("RECEIVED SIGNAL", payload);
 
-  if (
-    peerRef.current &&
-    (peerRef.current as any)._connected
-  ) {
-    console.log(
-      "Already connected"
-    );
+  if (peerRef.current) {
+    console.log("Peer already exists");
     return;
   }
 
@@ -195,9 +222,43 @@ export default function useWebRTC(roomId: string) {
     stream
   );
 
-  peer.on("connect", () => {
-    console.log("PEER CONNECTED");
-    (peer as any)._connected = true;
+  peer.on("stream", (remoteStream) => {
+    console.log(
+      "REMOTE STREAM RECEIVED"
+    );
+
+    console.log(
+      "REMOTE STREAM ID:",
+      remoteStream.id
+    );
+
+    console.log(
+      "VIDEO TRACKS:",
+      remoteStream.getVideoTracks()
+    );
+
+    console.log(
+      "AUDIO TRACKS:",
+      remoteStream.getAudioTracks()
+    );
+
+    if (mainScreenRef.current) {
+      mainScreenRef.current.srcObject =
+        remoteStream;
+
+      mainScreenRef.current
+        .play()
+        .catch(console.error);
+    }
+
+    if (partnerVideoRef.current) {
+      partnerVideoRef.current.srcObject =
+        remoteStream;
+
+      partnerVideoRef.current
+        .play()
+        .catch(console.error);
+    }
   });
 
   peerRef.current = peer;
@@ -241,13 +302,12 @@ export default function useWebRTC(roomId: string) {
     start();
 
     return () => {
-      socket.off("all-users");
-      socket.off("user-joined");
-      socket.off("receiving-signal");
-      socket.off("signal-returned");
+  socket.off();
 
-      peerRef.current?.destroy();
-    };
+  peerRef.current?.destroy();
+
+  peerRef.current = null;
+};
   }, [roomId]);
 
   function createPeer(
@@ -310,6 +370,13 @@ peer.on("signal", (signal) => {
       );
     });
 
+    peer.on("close", () => {
+  console.log("PEER CLOSED");
+  if (peerRef.current === peer) {
+    peerRef.current = null;
+  }
+});
+
     return peer;
   }
 
@@ -370,6 +437,14 @@ peer.on("signal", (signal) => {
         err
       );
     });
+
+    peer.on("close", () => {
+  console.log("PEER CLOSED");
+
+  if (peerRef.current === peer) {
+    peerRef.current = null;
+  }
+});
 
     peer.signal(incomingSignal);
 
