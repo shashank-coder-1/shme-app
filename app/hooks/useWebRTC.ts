@@ -63,29 +63,40 @@ export default function useWebRTC(roomId: string) {
         });
 
         socket.on("user-joined", (userId: string) => {
-          console.log("USER JOINED:", userId);
-
-          const peer = createPeer(
-            userId,
-            socket.id!,
-            stream
-          );
-
-          peer.on("stream", (remoteStream) => {
-            console.log("REMOTE STREAM RECEIVED");
-
-            if (mainScreenRef.current) {
-              mainScreenRef.current.srcObject =
-                remoteStream;
-            }
-
-            if (partnerVideoRef.current) {
-              partnerVideoRef.current.srcObject =
-                remoteStream;
-            }
-          });
-
-          peerRef.current = peer;
+            if (peerRef.current) return;
+            console.log("USER JOINED:", userId);
+            const peer = createPeer(
+                userId,
+                socket.id!,
+                stream
+            );
+            peer.on("stream", (remoteStream) => {
+                console.log("REMOTE STREAM RECEIVED");
+                console.log(
+                    "TRACKS:",
+                    remoteStream.getTracks()
+                );
+                
+                if (mainScreenRef.current) {
+                    mainScreenRef.current.srcObject =
+                    remoteStream;
+                    
+                    mainScreenRef.current
+                    .play()
+                    .catch(console.error);
+                }
+                
+                if (partnerVideoRef.current) {
+                    partnerVideoRef.current.srcObject =
+                    remoteStream;
+                    
+                    partnerVideoRef.current
+                    .play()
+                    .catch(console.error);
+                }
+            });
+            
+            peerRef.current = peer;
         });
 
         socket.on(
@@ -124,18 +135,28 @@ export default function useWebRTC(roomId: string) {
         );
 
         socket.on(
-          "signal-returned",
-          (payload: { signal: any }) => {
-            console.log(
-              "SIGNAL RETURNED",
-              payload
-            );
-
-            peerRef.current?.signal(
-              payload.signal
-            );
-          }
+            "signal-returned",
+            (payload: { signal: any }) => {
+                console.log(
+                    "SIGNAL RETURNED",
+                    payload
+                );
+                
+                if (!peerRef.current) return;
+                
+                try {
+                    peerRef.current.signal(
+                        payload.signal
+                    );
+                } catch (err) {
+                    console.error(
+                        "SIGNAL ERROR:",
+                        err
+                    );
+                }
+            }
         );
+        
       } catch (err) {
         console.error(
           "Camera/Mic Error:",
