@@ -242,20 +242,36 @@ export default function useWebRTC(roomId: string) {
     stream: MediaStream
   ) {
     const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream,
-      config: {
-        iceServers: [
-          {
-            urls:
-              "stun:stun.l.google.com:19302",
-          },
-        ],
+  initiator: true,
+  trickle: false,
+  stream,
+  config: {
+    iceServers: [
+      {
+        urls:
+          "stun:stun.l.google.com:19302",
       },
-    });
+    ],
+  },
+});
 
-    peer.on("signal", (signal) => {
+(peer as any)._pc.oniceconnectionstatechange =
+  () => {
+    console.log(
+      "ICE STATE:",
+      (peer as any)._pc.iceConnectionState
+    );
+  };
+
+(peer as any)._pc.onconnectionstatechange =
+  () => {
+    console.log(
+      "CONNECTION STATE:",
+      (peer as any)._pc.connectionState
+    );
+  };
+
+peer.on("signal", (signal) => {
   console.log(
     "CREATE PEER SIGNAL:",
     signal.type
@@ -269,8 +285,9 @@ export default function useWebRTC(roomId: string) {
 });
 
     peer.on("connect", () => {
-      console.log("PEER CONNECTED");
-    });
+  console.log("PEER CONNECTED");
+  (peer as any)._connected = true;
+});
 
     peer.on("error", (err) => {
       console.error(
@@ -288,20 +305,36 @@ export default function useWebRTC(roomId: string) {
     stream: MediaStream
   ) {
     const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream,
-      config: {
-        iceServers: [
-          {
-            urls:
-              "stun:stun.l.google.com:19302",
-          },
-        ],
+  initiator: false,
+  trickle: false,
+  stream,
+  config: {
+    iceServers: [
+      {
+        urls:
+          "stun:stun.l.google.com:19302",
       },
-    });
+    ],
+  },
+});
 
-    peer.on("signal", (signal) => {
+(peer as any)._pc.oniceconnectionstatechange =
+  () => {
+    console.log(
+      "ICE STATE:",
+      (peer as any)._pc.iceConnectionState
+    );
+  };
+
+(peer as any)._pc.onconnectionstatechange =
+  () => {
+    console.log(
+      "CONNECTION STATE:",
+      (peer as any)._pc.connectionState
+    );
+  };
+
+peer.on("signal", (signal) => {
   console.log(
     "ADD PEER SIGNAL:",
     signal.type
