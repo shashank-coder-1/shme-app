@@ -35,97 +35,46 @@ export default function useWebRTC(roomId: string) {
         socket.emit("join-room", roomId);
 
         socket.on("all-users", (users: string[]) => {
-          console.log("ALL USERS:", users);
+  console.log("ALL USERS:", users);
 
-          if (users.length > 0) {
-            const peer = createPeer(
-              users[0],
-              socket.id!,
-              stream
-            );
-
-            peer.on("stream", (remoteStream) => {
-  console.log("REMOTE STREAM RECEIVED");
-
-  console.log(
-    "VIDEO TRACKS:",
-    remoteStream.getVideoTracks()
-  );
-
-  console.log(
-    "AUDIO TRACKS:",
-    remoteStream.getAudioTracks()
-  );
-
-  if (mainScreenRef.current) {
-    mainScreenRef.current.srcObject =
-      remoteStream;
-
-    mainScreenRef.current
-      .play()
-      .catch(console.error);
-
-    console.log(
-      "MAIN VIDEO ELEMENT:",
-      mainScreenRef.current
+  if (users.length > 0 && !peerRef.current) {
+    const peer = createPeer(
+      users[0],
+      socket.id!,
+      stream
     );
 
-    setTimeout(() => {
-      console.log(
-        "READY STATE:",
-        mainScreenRef.current?.readyState
-      );
+    peer.on("stream", (remoteStream) => {
+      console.log("REMOTE STREAM RECEIVED");
 
-      console.log(
-        "VIDEO WIDTH:",
-        mainScreenRef.current?.videoWidth
-      );
+      if (mainScreenRef.current) {
+        mainScreenRef.current.srcObject =
+          remoteStream;
 
-      console.log(
-        "VIDEO HEIGHT:",
-        mainScreenRef.current?.videoHeight
-      );
+        mainScreenRef.current
+          .play()
+          .catch(console.error);
+      }
 
-      console.log(
-        "CURRENT SRC OBJECT:",
-        mainScreenRef.current?.srcObject
-      );
-    }, 2000);
-  }
+      if (partnerVideoRef.current) {
+        partnerVideoRef.current.srcObject =
+          remoteStream;
 
-  if (partnerVideoRef.current) {
-    partnerVideoRef.current.srcObject =
-      remoteStream;
+        partnerVideoRef.current
+          .play()
+          .catch(console.error);
+      }
+    });
 
-    partnerVideoRef.current
-      .play()
-      .catch(console.error);
-
-    setTimeout(() => {
-      console.log(
-        "PARTNER READY STATE:",
-        partnerVideoRef.current?.readyState
-      );
-
-      console.log(
-        "PARTNER VIDEO WIDTH:",
-        partnerVideoRef.current?.videoWidth
-      );
-
-      console.log(
-        "PARTNER VIDEO HEIGHT:",
-        partnerVideoRef.current?.videoHeight
-      );
-    }, 2000);
+    peerRef.current = peer;
   }
 });
 
-            peerRef.current = peer;
-          }
-        });
-
         socket.on("user-joined", (userId: string) => {
-            if (peerRef.current) return;
+            if (peerRef.current) {
+              console.log("Peer already exists");
+              return;
+            }
             console.log("USER JOINED:", userId);
             const peer = createPeer(
                 userId,
@@ -211,21 +160,13 @@ export default function useWebRTC(roomId: string) {
             peerRef.current = peer;
         });
 
-        socket.on(
-  "receiving-signal",
-  (payload: {
-    signal: any;
-    callerId: string;
-  }) => {
+        socket.on("receiving-signal", (payload) => {
     console.log(
       "RECEIVED SIGNAL",
       payload
     );
 
     if (peerRef.current) {
-      console.log(
-        "Peer already exists, skipping"
-      );
       return;
     }
 
@@ -236,88 +177,34 @@ export default function useWebRTC(roomId: string) {
     );
 
     peer.on("stream", (remoteStream) => {
-  console.log("REMOTE STREAM RECEIVED");
-
-  console.log(
-    "VIDEO TRACKS:",
-    remoteStream.getVideoTracks()
-  );
-
-  console.log(
-    "AUDIO TRACKS:",
-    remoteStream.getAudioTracks()
-  );
-
-  if (mainScreenRef.current) {
-    mainScreenRef.current.srcObject =
-      remoteStream;
-
-    mainScreenRef.current
-      .play()
-      .catch(console.error);
-
-    console.log(
-      "MAIN VIDEO ELEMENT:",
-      mainScreenRef.current
-    );
-
-    setTimeout(() => {
       console.log(
-        "READY STATE:",
-        mainScreenRef.current?.readyState
+        "REMOTE STREAM RECEIVED"
       );
 
-      console.log(
-        "VIDEO WIDTH:",
-        mainScreenRef.current?.videoWidth
-      );
+      if (mainScreenRef.current) {
+        mainScreenRef.current.srcObject =
+          remoteStream;
 
-      console.log(
-        "VIDEO HEIGHT:",
-        mainScreenRef.current?.videoHeight
-      );
+        mainScreenRef.current
+          .play()
+          .catch(console.error);
+      }
 
-      console.log(
-        "CURRENT SRC OBJECT:",
-        mainScreenRef.current?.srcObject
-      );
-    }, 2000);
-  }
+      if (partnerVideoRef.current) {
+        partnerVideoRef.current.srcObject =
+          remoteStream;
 
-  if (partnerVideoRef.current) {
-    partnerVideoRef.current.srcObject =
-      remoteStream;
-
-    partnerVideoRef.current
-      .play()
-      .catch(console.error);
-
-    setTimeout(() => {
-      console.log(
-        "PARTNER READY STATE:",
-        partnerVideoRef.current?.readyState
-      );
-
-      console.log(
-        "PARTNER VIDEO WIDTH:",
-        partnerVideoRef.current?.videoWidth
-      );
-
-      console.log(
-        "PARTNER VIDEO HEIGHT:",
-        partnerVideoRef.current?.videoHeight
-      );
-    }, 2000);
-  }
-});
+        partnerVideoRef.current
+          .play()
+          .catch(console.error);
+      }
+    });
 
     peerRef.current = peer;
   }
 );
 
-        socket.on(
-  "signal-returned",
-  (payload: { signal: any }) => {
+        socket.on("signal-returned", (payload: { signal: any }) => {
     console.log(
       "SIGNAL RETURNED",
       payload
