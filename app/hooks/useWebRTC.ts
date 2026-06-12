@@ -205,11 +205,11 @@ export default function useWebRTC(roomId: string) {
   }
 );
 
-        socket.on("signal-returned", (payload: { signal: any }) => {
-    console.log(
-      "SIGNAL RETURNED",
-      payload
-    );
+        socket.on("signal-returned", (payload) => {
+  console.log(
+    "SIGNAL TYPE:",
+    payload.signal.type
+  );
 
     if (
       peerRef.current &&
@@ -269,14 +269,17 @@ export default function useWebRTC(roomId: string) {
     });
 
     peer.on("signal", (signal) => {
-      console.log("SENDING SIGNAL");
+  console.log(
+    "CREATE PEER SIGNAL:",
+    signal.type
+  );
 
-      socket.emit("sending-signal", {
-        userToSignal,
-        callerId,
-        signal,
-      });
-    });
+  socket.emit("sending-signal", {
+    userToSignal,
+    callerId,
+    signal,
+  });
+});
 
     peer.on("connect", () => {
       console.log("PEER CONNECTED");
@@ -312,13 +315,16 @@ export default function useWebRTC(roomId: string) {
     });
 
     peer.on("signal", (signal) => {
-      console.log("RETURNING SIGNAL");
+  console.log(
+    "ADD PEER SIGNAL:",
+    signal.type
+  );
 
-      socket.emit("returning-signal", {
-        signal,
-        callerId,
-      });
-    });
+  socket.emit("returning-signal", {
+    signal,
+    callerId,
+  });
+});
 
     peer.on("connect", () => {
       console.log("PEER CONNECTED");
