@@ -45,36 +45,80 @@ export default function useWebRTC(roomId: string) {
             );
 
             peer.on("stream", (remoteStream) => {
-              console.log("REMOTE STREAM RECEIVED");
+  console.log("REMOTE STREAM RECEIVED");
 
-              console.log(
-                "VIDEO TRACKS:",
-                remoteStream.getVideoTracks()
-              );
+  console.log(
+    "VIDEO TRACKS:",
+    remoteStream.getVideoTracks()
+  );
 
-              console.log(
-                "AUDIO TRACKS:",
-                remoteStream.getAudioTracks()
-              );
+  console.log(
+    "AUDIO TRACKS:",
+    remoteStream.getAudioTracks()
+  );
 
-              if (mainScreenRef.current) {
-                mainScreenRef.current.srcObject =
-                  remoteStream;
+  if (mainScreenRef.current) {
+    mainScreenRef.current.srcObject =
+      remoteStream;
 
-                  mainScreenRef.current
-                  .play()
-                  .catch(console.error);
-                }
+    mainScreenRef.current
+      .play()
+      .catch(console.error);
 
-              if (partnerVideoRef.current) {
-                partnerVideoRef.current.srcObject =
-                  remoteStream;
-                
-                partnerVideoRef.current
-                .play()
-                .catch(console.error);
-             }
-            });
+    console.log(
+      "MAIN VIDEO ELEMENT:",
+      mainScreenRef.current
+    );
+
+    setTimeout(() => {
+      console.log(
+        "READY STATE:",
+        mainScreenRef.current?.readyState
+      );
+
+      console.log(
+        "VIDEO WIDTH:",
+        mainScreenRef.current?.videoWidth
+      );
+
+      console.log(
+        "VIDEO HEIGHT:",
+        mainScreenRef.current?.videoHeight
+      );
+
+      console.log(
+        "CURRENT SRC OBJECT:",
+        mainScreenRef.current?.srcObject
+      );
+    }, 2000);
+  }
+
+  if (partnerVideoRef.current) {
+    partnerVideoRef.current.srcObject =
+      remoteStream;
+
+    partnerVideoRef.current
+      .play()
+      .catch(console.error);
+
+    setTimeout(() => {
+      console.log(
+        "PARTNER READY STATE:",
+        partnerVideoRef.current?.readyState
+      );
+
+      console.log(
+        "PARTNER VIDEO WIDTH:",
+        partnerVideoRef.current?.videoWidth
+      );
+
+      console.log(
+        "PARTNER VIDEO HEIGHT:",
+        partnerVideoRef.current?.videoHeight
+      );
+    }, 2000);
+  }
+});
 
             peerRef.current = peer;
           }
@@ -89,36 +133,80 @@ export default function useWebRTC(roomId: string) {
                 stream
             );
             peer.on("stream", (remoteStream) => {
-              console.log("REMOTE STREAM RECEIVED");
+  console.log("REMOTE STREAM RECEIVED");
 
-              console.log(
-                "VIDEO TRACKS:",
-                remoteStream.getVideoTracks()
-              );
+  console.log(
+    "VIDEO TRACKS:",
+    remoteStream.getVideoTracks()
+  );
 
-              console.log(
-                "AUDIO TRACKS:",
-                remoteStream.getAudioTracks()
-              );
+  console.log(
+    "AUDIO TRACKS:",
+    remoteStream.getAudioTracks()
+  );
 
-              if (mainScreenRef.current) {
-                mainScreenRef.current.srcObject =
-                  remoteStream;
+  if (mainScreenRef.current) {
+    mainScreenRef.current.srcObject =
+      remoteStream;
 
-                  mainScreenRef.current
-                  .play()
-                  .catch(console.error);
-                }
+    mainScreenRef.current
+      .play()
+      .catch(console.error);
 
-              if (partnerVideoRef.current) {
-                partnerVideoRef.current.srcObject =
-                  remoteStream;
-                
-                partnerVideoRef.current
-                .play()
-                .catch(console.error);
-             }
-            });
+    console.log(
+      "MAIN VIDEO ELEMENT:",
+      mainScreenRef.current
+    );
+
+    setTimeout(() => {
+      console.log(
+        "READY STATE:",
+        mainScreenRef.current?.readyState
+      );
+
+      console.log(
+        "VIDEO WIDTH:",
+        mainScreenRef.current?.videoWidth
+      );
+
+      console.log(
+        "VIDEO HEIGHT:",
+        mainScreenRef.current?.videoHeight
+      );
+
+      console.log(
+        "CURRENT SRC OBJECT:",
+        mainScreenRef.current?.srcObject
+      );
+    }, 2000);
+  }
+
+  if (partnerVideoRef.current) {
+    partnerVideoRef.current.srcObject =
+      remoteStream;
+
+    partnerVideoRef.current
+      .play()
+      .catch(console.error);
+
+    setTimeout(() => {
+      console.log(
+        "PARTNER READY STATE:",
+        partnerVideoRef.current?.readyState
+      );
+
+      console.log(
+        "PARTNER VIDEO WIDTH:",
+        partnerVideoRef.current?.videoWidth
+      );
+
+      console.log(
+        "PARTNER VIDEO HEIGHT:",
+        partnerVideoRef.current?.videoHeight
+      );
+    }, 2000);
+  }
+});
             
             peerRef.current = peer;
         });
@@ -148,38 +236,80 @@ export default function useWebRTC(roomId: string) {
     );
 
     peer.on("stream", (remoteStream) => {
+  console.log("REMOTE STREAM RECEIVED");
+
+  console.log(
+    "VIDEO TRACKS:",
+    remoteStream.getVideoTracks()
+  );
+
+  console.log(
+    "AUDIO TRACKS:",
+    remoteStream.getAudioTracks()
+  );
+
+  if (mainScreenRef.current) {
+    mainScreenRef.current.srcObject =
+      remoteStream;
+
+    mainScreenRef.current
+      .play()
+      .catch(console.error);
+
+    console.log(
+      "MAIN VIDEO ELEMENT:",
+      mainScreenRef.current
+    );
+
+    setTimeout(() => {
       console.log(
-        "REMOTE STREAM RECEIVED"
+        "READY STATE:",
+        mainScreenRef.current?.readyState
       );
 
       console.log(
-        "VIDEO TRACKS:",
-        remoteStream.getVideoTracks()
+        "VIDEO WIDTH:",
+        mainScreenRef.current?.videoWidth
       );
 
       console.log(
-        "AUDIO TRACKS:",
-        remoteStream.getAudioTracks()
+        "VIDEO HEIGHT:",
+        mainScreenRef.current?.videoHeight
       );
 
-      if (mainScreenRef.current) {
-        mainScreenRef.current.srcObject =
-          remoteStream;
+      console.log(
+        "CURRENT SRC OBJECT:",
+        mainScreenRef.current?.srcObject
+      );
+    }, 2000);
+  }
 
-        mainScreenRef.current
-          .play()
-          .catch(console.error);
-      }
+  if (partnerVideoRef.current) {
+    partnerVideoRef.current.srcObject =
+      remoteStream;
 
-      if (partnerVideoRef.current) {
-        partnerVideoRef.current.srcObject =
-          remoteStream;
+    partnerVideoRef.current
+      .play()
+      .catch(console.error);
 
-        partnerVideoRef.current
-          .play()
-          .catch(console.error);
-      }
-    });
+    setTimeout(() => {
+      console.log(
+        "PARTNER READY STATE:",
+        partnerVideoRef.current?.readyState
+      );
+
+      console.log(
+        "PARTNER VIDEO WIDTH:",
+        partnerVideoRef.current?.videoWidth
+      );
+
+      console.log(
+        "PARTNER VIDEO HEIGHT:",
+        partnerVideoRef.current?.videoHeight
+      );
+    }, 2000);
+  }
+});
 
     peerRef.current = peer;
   }

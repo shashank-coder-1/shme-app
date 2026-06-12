@@ -180,8 +180,13 @@ export default function RoomPage() {
           <video
             ref={mainScreenRef}
             autoPlay
+            muted
             playsInline
+            controls={false}
             className="w-full h-full object-cover"
+            onLoadedMetadata={() => {
+              console.log("MAIN VIDEO LOADED");
+            }}
           />
 
           {/* Soft Gradient Overlay */}
