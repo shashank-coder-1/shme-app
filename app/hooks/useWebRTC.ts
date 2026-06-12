@@ -47,15 +47,33 @@ export default function useWebRTC(roomId: string) {
             peer.on("stream", (remoteStream) => {
               console.log("REMOTE STREAM RECEIVED");
 
+              console.log(
+                "VIDEO TRACKS:",
+                remoteStream.getVideoTracks()
+              );
+
+              console.log(
+                "AUDIO TRACKS:",
+                remoteStream.getAudioTracks()
+              );
+
               if (mainScreenRef.current) {
                 mainScreenRef.current.srcObject =
                   remoteStream;
-              }
+
+                  mainScreenRef.current
+                  .play()
+                  .catch(console.error);
+                }
 
               if (partnerVideoRef.current) {
                 partnerVideoRef.current.srcObject =
                   remoteStream;
-              }
+                
+                partnerVideoRef.current
+                .play()
+                .catch(console.error);
+             }
             });
 
             peerRef.current = peer;
@@ -71,29 +89,35 @@ export default function useWebRTC(roomId: string) {
                 stream
             );
             peer.on("stream", (remoteStream) => {
-                console.log("REMOTE STREAM RECEIVED");
-                console.log(
-                    "TRACKS:",
-                    remoteStream.getTracks()
-                );
-                
-                if (mainScreenRef.current) {
-                    mainScreenRef.current.srcObject =
-                    remoteStream;
-                    
-                    mainScreenRef.current
-                    .play()
-                    .catch(console.error);
+              console.log("REMOTE STREAM RECEIVED");
+
+              console.log(
+                "VIDEO TRACKS:",
+                remoteStream.getVideoTracks()
+              );
+
+              console.log(
+                "AUDIO TRACKS:",
+                remoteStream.getAudioTracks()
+              );
+
+              if (mainScreenRef.current) {
+                mainScreenRef.current.srcObject =
+                  remoteStream;
+
+                  mainScreenRef.current
+                  .play()
+                  .catch(console.error);
                 }
+
+              if (partnerVideoRef.current) {
+                partnerVideoRef.current.srcObject =
+                  remoteStream;
                 
-                if (partnerVideoRef.current) {
-                    partnerVideoRef.current.srcObject =
-                    remoteStream;
-                    
-                    partnerVideoRef.current
-                    .play()
-                    .catch(console.error);
-                }
+                partnerVideoRef.current
+                .play()
+                .catch(console.error);
+             }
             });
             
             peerRef.current = peer;
@@ -119,15 +143,33 @@ export default function useWebRTC(roomId: string) {
             peer.on("stream", (remoteStream) => {
               console.log("REMOTE STREAM RECEIVED");
 
+              console.log(
+                "VIDEO TRACKS:",
+                remoteStream.getVideoTracks()
+              );
+
+              console.log(
+                "AUDIO TRACKS:",
+                remoteStream.getAudioTracks()
+              );
+
               if (mainScreenRef.current) {
                 mainScreenRef.current.srcObject =
                   remoteStream;
-              }
+
+                  mainScreenRef.current
+                  .play()
+                  .catch(console.error);
+                }
 
               if (partnerVideoRef.current) {
                 partnerVideoRef.current.srcObject =
                   remoteStream;
-              }
+                
+                partnerVideoRef.current
+                .play()
+                .catch(console.error);
+             }
             });
 
             peerRef.current = peer;
@@ -156,7 +198,7 @@ export default function useWebRTC(roomId: string) {
                 }
             }
         );
-        
+
       } catch (err) {
         console.error(
           "Camera/Mic Error:",
