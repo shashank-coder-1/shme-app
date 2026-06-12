@@ -162,73 +162,68 @@ export default function useWebRTC(roomId: string) {
             peerRef.current = peer;
         });
 
-        socket.on("receiving-signal", (payload: {
-    signal: any;
-    callerId: string;
-  }) => {
+        socket.on("receiving-signal", (payload) => {
+  console.log("RECEIVED SIGNAL", payload);
+
+  if (peerRef.current) {
     console.log(
-      "RECEIVED SIGNAL",
-      payload
+      "Peer already exists"
     );
-
-    const peer = addPeer(
-      payload.signal,
-      payload.callerId,
-      stream
-    );
-
-    peer.on("stream", (remoteStream) => {
-      console.log(
-        "REMOTE STREAM RECEIVED"
-      );
-
-      if (mainScreenRef.current) {
-        mainScreenRef.current.srcObject =
-          remoteStream;
-
-        mainScreenRef.current
-          .play()
-          .catch(console.error);
-      }
-
-      if (partnerVideoRef.current) {
-        partnerVideoRef.current.srcObject =
-          remoteStream;
-
-        partnerVideoRef.current
-          .play()
-          .catch(console.error);
-      }
-    });
-
-    peerRef.current = peer;
+    return;
   }
-);
+
+  const peer = addPeer(
+    payload.signal,
+    payload.callerId,
+    stream
+  );
+
+  peer.on("stream", (remoteStream) => {
+    console.log(
+      "REMOTE STREAM RECEIVED"
+    );
+
+    if (mainScreenRef.current) {
+      mainScreenRef.current.srcObject =
+        remoteStream;
+    }
+
+    if (partnerVideoRef.current) {
+      partnerVideoRef.current.srcObject =
+        remoteStream;
+    }
+  });
+
+  peerRef.current = peer;
+});
 
         socket.on("signal-returned", (payload) => {
   console.log(
-    "SIGNAL TYPE:",
+    "SIGNAL RETURNED",
     payload.signal.type
   );
 
-    if (
-      peerRef.current &&
-      !(peerRef.current as any)
-        ._signalApplied
-    ) {
-      (peerRef.current as any)
-        ._signalApplied = true;
+  if (!peerRef.current) return;
 
-      try {
-        peerRef.current.signal(
-          payload.signal
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    }
+  const pc = (peerRef.current as any)._pc;
+
+  console.log(
+    "SIGNAL STATE:",
+    pc.signalingState
+  );
+
+  if (pc.signalingState !== "have-local-offer") {
+    console.log(
+      "Ignoring duplicate answer"
+    );
+    return;
   }
-);
+
+  peerRef.current.signal(
+    payload.signal
+  );
+});
+
       } catch (err) {
         console.error(
           "Camera/Mic Error:",
