@@ -105,10 +105,17 @@ export default function useWebRTC(roomId: string) {
     stream: MediaStream
   ) {
     const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream,
-    });
+        initiator: true,
+        trickle: false,
+        stream,
+        config: {
+          iceServers: [
+            {
+                urls: "stun:stun.l.google.com:19302",
+            },
+        ],
+    },
+});
 
     peer.on("signal", (signal) => {
       socket.emit("sending-signal", {
@@ -127,10 +134,17 @@ export default function useWebRTC(roomId: string) {
     stream: MediaStream
   ) {
     const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream,
-    });
+        initiator: false,
+        trickle: false,
+        stream,
+        config: {
+          iceServers: [
+            {
+                urls: "stun:stun.l.google.com:19302",
+            },
+        ],
+    },
+});
 
     peer.on("signal", (signal) => {
       socket.emit("returning-signal", {
