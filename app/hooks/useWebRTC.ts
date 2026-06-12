@@ -100,166 +100,28 @@ console.log(
 });
 
         socket.on("user-joined", (userId: string) => {
-            if (peerRef.current) {
-              console.log("Peer already exists");
-              return;
-            }
-            console.log("USER JOINED:", userId);
-            const peer = createPeer(
-                userId,
-                socket.id!,
-                stream
-            );
-            peer.on("stream", (remoteStream) => {
-  console.log("REMOTE STREAM RECEIVED");
+  console.log("USER JOINED:", userId);
 
-  console.log(
-    "VIDEO TRACKS:",
-    remoteStream.getVideoTracks()
-  );
-
-  console.log(
-    "AUDIO TRACKS:",
-    remoteStream.getAudioTracks()
-  );
-
-  if (mainScreenRef.current) {
-    mainScreenRef.current.srcObject = remoteStream;
-    mainScreenRef.current.onloadedmetadata =
-    () => {
-    console.log(
-      "MAIN VIDEO LOADED"
-    );
-
-    mainScreenRef.current
-      ?.play()
-      .catch(console.error);
-  };
-
-    mainScreenRef.current
-      .play()
-      .catch(console.error);
-
-    console.log(
-      "MAIN VIDEO ELEMENT:",
-      mainScreenRef.current
-    );
-
-    setTimeout(() => {
-      console.log(
-        "READY STATE:",
-        mainScreenRef.current?.readyState
-      );
-
-      console.log(
-        "VIDEO WIDTH:",
-        mainScreenRef.current?.videoWidth
-      );
-
-      console.log(
-        "VIDEO HEIGHT:",
-        mainScreenRef.current?.videoHeight
-      );
-
-      console.log(
-        "CURRENT SRC OBJECT:",
-        mainScreenRef.current?.srcObject
-      );
-    }, 2000);
-  }
-
-  if (partnerVideoRef.current) {
-    partnerVideoRef.current.srcObject =
-    remoteStream;
-    partnerVideoRef.current.onloadedmetadata =
-    () => {
-    console.log(
-      "PARTNER VIDEO LOADED"
-    );
-
-    partnerVideoRef.current
-      ?.play()
-      .catch(console.error);
-  };
-
-    partnerVideoRef.current
-      .play()
-      .catch(console.error);
-
-    setTimeout(() => {
-      console.log(
-        "PARTNER READY STATE:",
-        partnerVideoRef.current?.readyState
-      );
-
-      console.log(
-        "PARTNER VIDEO WIDTH:",
-        partnerVideoRef.current?.videoWidth
-      );
-
-      console.log(
-        "PARTNER VIDEO HEIGHT:",
-        partnerVideoRef.current?.videoHeight
-      );
-    }, 2000);
-  }
+  // Do NOT create a peer here.
+  // The existing user will answer when
+  // "receiving-signal" arrives.
 });
-            
-            peerRef.current = peer;
-        });
 
         socket.on("receiving-signal", (payload) => {
   console.log("RECEIVED SIGNAL", payload);
 
   if (peerRef.current) {
-    console.log("Peer already exists");
-    return;
-  }
+  console.log(
+    "Peer already exists"
+  );
+  return;
+}
 
   const peer = addPeer(
     payload.signal,
     payload.callerId,
     stream
   );
-
-  peer.on("stream", (remoteStream) => {
-    console.log(
-      "REMOTE STREAM RECEIVED"
-    );
-
-    console.log(
-      "REMOTE STREAM ID:",
-      remoteStream.id
-    );
-
-    console.log(
-      "VIDEO TRACKS:",
-      remoteStream.getVideoTracks()
-    );
-
-    console.log(
-      "AUDIO TRACKS:",
-      remoteStream.getAudioTracks()
-    );
-
-    if (mainScreenRef.current) {
-      mainScreenRef.current.srcObject =
-        remoteStream;
-
-      mainScreenRef.current
-        .play()
-        .catch(console.error);
-    }
-
-    if (partnerVideoRef.current) {
-      partnerVideoRef.current.srcObject =
-        remoteStream;
-
-      partnerVideoRef.current
-        .play()
-        .catch(console.error);
-    }
-  });
 
   peerRef.current = peer;
 });
@@ -302,13 +164,20 @@ console.log(
     start();
 
     return () => {
-  socket.off();
+  socket.off("all-users");
+  socket.off("user-joined");
+  socket.off("receiving-signal");
+  socket.off("signal-returned");
+  socket.off("connect");
+  socket.off("disconnect");
 
   peerRef.current?.destroy();
 
   peerRef.current = null;
 };
-  }, [roomId]);
+  
+
+}, [roomId]);
 
   function createPeer(
     userToSignal: string,
@@ -328,6 +197,7 @@ console.log(
     ],
   },
 });
+(peer as any)._initiator = true;
 
 (peer as any)._pc.oniceconnectionstatechange =
   () => {
@@ -345,7 +215,14 @@ console.log(
     );
   };
 
-peer.on("signal", (signal) => {
+  peer.on("stream", (stream) => {
+  console.log(
+    "STREAM EVENT FIRED",
+    stream.id
+  );
+});
+
+  peer.on("signal", (signal) => {
   console.log(
     "CREATE PEER SIGNAL:",
     signal.type
@@ -398,6 +275,7 @@ peer.on("signal", (signal) => {
     ],
   },
 });
+(peer as any)._initiator = false;
 
 (peer as any)._pc.oniceconnectionstatechange =
   () => {
@@ -415,7 +293,14 @@ peer.on("signal", (signal) => {
     );
   };
 
-peer.on("signal", (signal) => {
+peer.on("stream", (stream) => {
+  console.log(
+    "STREAM EVENT FIRED",
+    stream.id
+  );
+});
+
+  peer.on("signal", (signal) => {
   console.log(
     "ADD PEER SIGNAL:",
     signal.type
