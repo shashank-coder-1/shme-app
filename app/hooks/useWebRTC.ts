@@ -53,50 +53,20 @@ export default function useWebRTC(roomId: string) {
         socket.on("all-users", (users: string[]) => {
   console.log("ALL USERS:", users);
 
-  if (users.length > 0 && !peerRef.current) {
-    const peer = createPeer(
-      users[0],
-      socket.id!,
-      stream
-    );
+  if (users.length === 0) return;
 
-    peer.on("stream", (remoteStream) => {
-      console.log(
-  "REMOTE STREAM TRACKS:",
-  remoteStream.getTracks()
-);
-
-console.log(
-  "VIDEO TRACKS:",
-  remoteStream.getVideoTracks()
-);
-
-console.log(
-  "AUDIO TRACKS:",
-  remoteStream.getAudioTracks()
-);
-
-      if (mainScreenRef.current) {
-        mainScreenRef.current.srcObject =
-          remoteStream;
-
-        mainScreenRef.current
-          .play()
-          .catch(console.error);
-      }
-
-      if (partnerVideoRef.current) {
-        partnerVideoRef.current.srcObject =
-          remoteStream;
-
-        partnerVideoRef.current
-          .play()
-          .catch(console.error);
-      }
-    });
-
-    peerRef.current = peer;
+  if (peerRef.current) {
+    console.log("Peer already exists");
+    return;
   }
+
+  const peer = createPeer(
+    users[0],
+    socket.id!,
+    stream
+  );
+
+  peerRef.current = peer;
 });
 
         socket.on("user-joined", (userId: string) => {
@@ -110,12 +80,15 @@ console.log(
         socket.on("receiving-signal", (payload) => {
   console.log("RECEIVED SIGNAL", payload);
 
-  if (peerRef.current) {
-  console.log(
-    "Peer already exists"
-  );
-  return;
-}
+  if (
+    peerRef.current &&
+    (peerRef.current as any)._initiator
+  ) {
+    console.log(
+      "Initiator already exists"
+    );
+    return;
+  }
 
   const peer = addPeer(
     payload.signal,
@@ -215,11 +188,33 @@ console.log(
     );
   };
 
-  peer.on("stream", (stream) => {
+  peer.on("stream", (remoteStream) => {
   console.log(
-    "STREAM EVENT FIRED",
-    stream.id
+    "REMOTE STREAM RECEIVED",
+    remoteStream.id
   );
+
+  if (mainScreenRef.current) {
+  mainScreenRef.current.srcObject =
+    remoteStream;
+
+  mainScreenRef.current
+    .play()
+    .catch(console.error);
+
+  console.log("MAIN VIDEO ASSIGNED");
+}
+
+  if (partnerVideoRef.current) {
+  partnerVideoRef.current.srcObject =
+    remoteStream;
+
+  partnerVideoRef.current
+    .play()
+    .catch(console.error);
+
+  console.log("PARTNER VIDEO ASSIGNED");
+}
 });
 
   peer.on("signal", (signal) => {
@@ -293,11 +288,33 @@ console.log(
     );
   };
 
-peer.on("stream", (stream) => {
+peer.on("stream", (remoteStream) => {
   console.log(
-    "STREAM EVENT FIRED",
-    stream.id
+    "REMOTE STREAM RECEIVED",
+    remoteStream.id
   );
+
+  if (mainScreenRef.current) {
+  mainScreenRef.current.srcObject =
+    remoteStream;
+
+  mainScreenRef.current
+    .play()
+    .catch(console.error);
+
+  console.log("MAIN VIDEO ASSIGNED");
+}
+
+  if (partnerVideoRef.current) {
+  partnerVideoRef.current.srcObject =
+    remoteStream;
+
+  partnerVideoRef.current
+    .play()
+    .catch(console.error);
+
+  console.log("PARTNER VIDEO ASSIGNED");
+}
 });
 
   peer.on("signal", (signal) => {
