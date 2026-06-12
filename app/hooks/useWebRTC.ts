@@ -162,18 +162,14 @@ export default function useWebRTC(roomId: string) {
             peerRef.current = peer;
         });
 
-        socket.on("receiving-signal",(payload: {
-          signal: any;
-          callerId: string;
-        }) => {
+        socket.on("receiving-signal", (payload: {
+    signal: any;
+    callerId: string;
+  }) => {
     console.log(
       "RECEIVED SIGNAL",
       payload
     );
-
-    if (peerRef.current) {
-      return;
-    }
 
     const peer = addPeer(
       payload.signal,
