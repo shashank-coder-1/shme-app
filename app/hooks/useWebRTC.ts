@@ -124,81 +124,93 @@ export default function useWebRTC(roomId: string) {
         });
 
         socket.on(
-          "receiving-signal",
-          (payload: {
-            signal: any;
-            callerId: string;
-          }) => {
-            console.log(
-              "RECEIVED SIGNAL",
-              payload
-            );
+  "receiving-signal",
+  (payload: {
+    signal: any;
+    callerId: string;
+  }) => {
+    console.log(
+      "RECEIVED SIGNAL",
+      payload
+    );
 
-            const peer = addPeer(
-              payload.signal,
-              payload.callerId,
-              stream
-            );
+    if (peerRef.current) {
+      console.log(
+        "Peer already exists, skipping"
+      );
+      return;
+    }
 
-            peer.on("stream", (remoteStream) => {
-              console.log("REMOTE STREAM RECEIVED");
+    const peer = addPeer(
+      payload.signal,
+      payload.callerId,
+      stream
+    );
 
-              console.log(
-                "VIDEO TRACKS:",
-                remoteStream.getVideoTracks()
-              );
+    peer.on("stream", (remoteStream) => {
+      console.log(
+        "REMOTE STREAM RECEIVED"
+      );
 
-              console.log(
-                "AUDIO TRACKS:",
-                remoteStream.getAudioTracks()
-              );
+      console.log(
+        "VIDEO TRACKS:",
+        remoteStream.getVideoTracks()
+      );
 
-              if (mainScreenRef.current) {
-                mainScreenRef.current.srcObject =
-                  remoteStream;
+      console.log(
+        "AUDIO TRACKS:",
+        remoteStream.getAudioTracks()
+      );
 
-                  mainScreenRef.current
-                  .play()
-                  .catch(console.error);
-                }
+      if (mainScreenRef.current) {
+        mainScreenRef.current.srcObject =
+          remoteStream;
 
-              if (partnerVideoRef.current) {
-                partnerVideoRef.current.srcObject =
-                  remoteStream;
-                
-                partnerVideoRef.current
-                .play()
-                .catch(console.error);
-             }
-            });
+        mainScreenRef.current
+          .play()
+          .catch(console.error);
+      }
 
-            peerRef.current = peer;
-          }
-        );
+      if (partnerVideoRef.current) {
+        partnerVideoRef.current.srcObject =
+          remoteStream;
+
+        partnerVideoRef.current
+          .play()
+          .catch(console.error);
+      }
+    });
+
+    peerRef.current = peer;
+  }
+);
 
         socket.on(
-            "signal-returned",
-            (payload: { signal: any }) => {
-                console.log(
-                    "SIGNAL RETURNED",
-                    payload
-                );
-                
-                if (!peerRef.current) return;
-                
-                try {
-                    peerRef.current.signal(
-                        payload.signal
-                    );
-                } catch (err) {
-                    console.error(
-                        "SIGNAL ERROR:",
-                        err
-                    );
-                }
-            }
-        );
+  "signal-returned",
+  (payload: { signal: any }) => {
+    console.log(
+      "SIGNAL RETURNED",
+      payload
+    );
 
+    if (
+      peerRef.current &&
+      !(peerRef.current as any)
+        ._signalApplied
+    ) {
+      (peerRef.current as any)
+        ._signalApplied = true;
+
+      try {
+        peerRef.current.signal(
+          payload.signal
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+);
       } catch (err) {
         console.error(
           "Camera/Mic Error:",
