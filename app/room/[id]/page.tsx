@@ -32,6 +32,14 @@ export default function RoomPage() {
   const [copied, setCopied] =
   useState(false);
 
+  const [isLandscape, setIsLandscape] =
+  useState(false);
+
+  const isIOS =
+  /iPhone|iPad|iPod/.test(
+    navigator.userAgent
+  );
+
   const {
     localVideoRef,
     mainScreenRef,
@@ -66,13 +74,54 @@ export default function RoomPage() {
     };
   }, []);
 
+useEffect(() => {
+  const handleResize = () => {
+    setIsLandscape(
+      window.innerWidth >
+      window.innerHeight
+    );
+  };
+
+  handleResize();
+
+  window.addEventListener(
+    "resize",
+    handleResize
+  );
+
+  return () =>
+    window.removeEventListener(
+      "resize",
+      handleResize
+    );
+}, []);
+
   const toggleFullscreen = async () => {
+  try {
     if (!document.fullscreenElement) {
       await movieContainerRef.current?.requestFullscreen();
+
+      if (
+        screen.orientation &&
+        "lock" in screen.orientation
+      ) {
+        try {
+          await (
+            screen.orientation as any
+          ).lock("landscape");
+        } catch (err) {
+          console.log(
+            "Orientation lock not supported"
+          );
+        }
+      }
     } else {
       await document.exitFullscreen();
     }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
  
   const copyInviteLink = async () => {
   try {
@@ -159,22 +208,23 @@ export default function RoomPage() {
 
         {/* Movie Container */}
         <div
-          ref={movieContainerRef}
-          className="
-          relative
-          w-[95vw]
-          max-w-[1400px]
-          h-[65vh]
-          md:h-[800px]
-          overflow-hidden
-          rounded-[24px]
-          md:rounded-[40px]
-          bg-white/10
-          backdrop-blur-xl
-          border
-          border-white/30
-          shadow-[0_20px_80px_rgba(0,0,0,0.35)]"
-        >
+  ref={movieContainerRef}
+  className={`
+  relative
+  overflow-hidden
+  bg-white/10
+  backdrop-blur-xl
+  border
+  border-white/30
+  shadow-[0_20px_80px_rgba(0,0,0,0.35)]
+
+  ${
+    isLandscape
+      ? "w-screen h-screen rounded-none"
+      : "w-[95vw] max-w-[1400px] h-[65vh] md:h-[800px] rounded-[24px] md:rounded-[40px]"
+  }
+`}
+>
 
           {/* Main Screen */}
           <video
@@ -387,6 +437,7 @@ export default function RoomPage() {
 </button>
 
   {/* Fullscreen */}
+ {!isIOS && (
   <button
     onClick={toggleFullscreen}
     title="Fullscreen"
@@ -402,11 +453,11 @@ export default function RoomPage() {
       bg-white/15
       hover:bg-white/25
       transition
-      transition
     "
   >
     <Maximize size={22} />
   </button>
+)}
 
   {/* End Call */}
   <button
