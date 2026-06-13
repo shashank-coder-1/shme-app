@@ -167,224 +167,166 @@ export default function useWebRTC(roomId: string) {
 
 }, [roomId]);
 
-  function createPeer(
-    userToSignal: string,
-    callerId: string,
-    stream: MediaStream
-  ) {
-    const peer = new Peer({
-  initiator: true,
-  trickle: false,
-  stream,
-
+function createPeer(
+  userToSignal: string,
+  callerId: string,
+  stream: MediaStream
+) {
+  const peer = new Peer({
+    initiator: true,
+    trickle: false,
+    stream,
     config: {
       iceServers: ICE_SERVERS,
     },
   });
 
-(peer as any)._pc.onicecandidate = (
-  event: any
-) => {
-  if (event.candidate) {
-    console.log(
-      "ICE CANDIDATE:",
-      event.candidate.type
-    );
-  }
-};
-
-(peer as any)._initiator = true;
-
-(peer as any)._pc.oniceconnectionstatechange =
-  () => {
-    console.log(
-      "ICE STATE:",
-      (peer as any)._pc.iceConnectionState
-    );
-  };
-
-(peer as any)._pc.onconnectionstatechange =
-  () => {
-    console.log(
-      "CONNECTION STATE:",
-      (peer as any)._pc.connectionState
-    );
-  };
-
-  peer.on("stream", (remoteStream) => {
-  console.log(
-    "REMOTE STREAM RECEIVED",
-    remoteStream.id
-  );
-
-  if (mainScreenRef.current) {
-  mainScreenRef.current.srcObject =
-    remoteStream;
-
-  mainScreenRef.current
-    .play()
-    .catch(console.error);
-
-  console.log("MAIN VIDEO ASSIGNED");
-}
-
-  if (partnerVideoRef.current) {
-  partnerVideoRef.current.srcObject =
-    remoteStream;
-
-  partnerVideoRef.current
-    .play()
-    .catch(console.error);
-
-  console.log("PARTNER VIDEO ASSIGNED");
-}
-});
+  (peer as any)._initiator = true;
 
   peer.on("signal", (signal) => {
-  console.log(
-    "CREATE PEER SIGNAL:",
-    signal.type
-  );
+    console.log("SIGNAL EVENT FIRED");
+    console.log(signal);
 
-  socket.emit("sending-signal", {
-    userToSignal,
-    callerId,
-    signal,
-  });
-});
-
-    peer.on("connect", () => {
-  console.log("PEER CONNECTED");
-  (peer as any)._connected = true;
-});
-
-    peer.on("error", (err) => {
-      console.error(
-        "PEER ERROR:",
-        err
-      );
+    socket.emit("sending-signal", {
+      userToSignal,
+      callerId,
+      signal,
     });
+  });
 
-    peer.on("close", () => {
-  console.log("PEER CLOSED");
-  if (peerRef.current === peer) {
-    peerRef.current = null;
-  }
-});
+  peer.on("stream", (remoteStream) => {
+    console.log(
+      "REMOTE STREAM RECEIVED",
+      remoteStream.id
+    );
 
-console.log("CREATE PEER FUNCTION FINISHED");
+    if (mainScreenRef.current) {
+      mainScreenRef.current.srcObject =
+        remoteStream;
 
-    return peer;
-  }
+      mainScreenRef.current
+        .play()
+        .catch(console.error);
 
-  function addPeer(
-    incomingSignal: any,
-    callerId: string,
-    stream: MediaStream
-  ) {
-    const peer = new Peer({
-  initiator: false,
-  trickle: false,
-  stream,
-   
-  config: {
+      console.log("MAIN VIDEO ASSIGNED");
+    }
+
+    if (partnerVideoRef.current) {
+      partnerVideoRef.current.srcObject =
+        remoteStream;
+
+      partnerVideoRef.current
+        .play()
+        .catch(console.error);
+
+      console.log("PARTNER VIDEO ASSIGNED");
+    }
+  });
+
+  peer.on("connect", () => {
+    console.log("PEER CONNECTED");
+  });
+
+  peer.on("error", (err) => {
+    console.error("PEER ERROR:", err);
+  });
+
+  peer.on("close", () => {
+    console.log("PEER CLOSED");
+
+    if (peerRef.current === peer) {
+      peerRef.current = null;
+    }
+  });
+
+  console.log("CREATE PEER FUNCTION FINISHED");
+
+  return peer;
+}
+
+function addPeer(
+  incomingSignal: any,
+  callerId: string,
+  stream: MediaStream
+) {
+  const peer = new Peer({
+    initiator: false,
+    trickle: false,
+    stream,
+    config: {
       iceServers: ICE_SERVERS,
     },
   });
 
-(peer as any)._pc.onicecandidate = (
-  event: any
-) => {
-  if (event.candidate) {
+  (peer as any)._initiator = false;
+
+  peer.on("stream", (remoteStream) => {
     console.log(
-      "ICE CANDIDATE:",
-      event.candidate.type
+      "REMOTE STREAM RECEIVED",
+      remoteStream.id
     );
-  }
-};
 
-(peer as any)._initiator = false;
+    if (mainScreenRef.current) {
+      mainScreenRef.current.srcObject =
+        remoteStream;
 
-(peer as any)._pc.oniceconnectionstatechange =
-  () => {
-    console.log(
-      "ICE STATE:",
-      (peer as any)._pc.iceConnectionState
-    );
-  };
+      mainScreenRef.current
+        .play()
+        .catch(console.error);
 
-(peer as any)._pc.onconnectionstatechange =
-  () => {
-    console.log(
-      "CONNECTION STATE:",
-      (peer as any)._pc.connectionState
-    );
-  };
+      console.log("MAIN VIDEO ASSIGNED");
+    }
 
-peer.on("stream", (remoteStream) => {
-  console.log(
-    "REMOTE STREAM RECEIVED",
-    remoteStream.id
-  );
+    if (partnerVideoRef.current) {
+      partnerVideoRef.current.srcObject =
+        remoteStream;
 
-  if (mainScreenRef.current) {
-  mainScreenRef.current.srcObject =
-    remoteStream;
+      partnerVideoRef.current
+        .play()
+        .catch(console.error);
 
-  mainScreenRef.current
-    .play()
-    .catch(console.error);
-
-  console.log("MAIN VIDEO ASSIGNED");
-}
-
-  if (partnerVideoRef.current) {
-  partnerVideoRef.current.srcObject =
-    remoteStream;
-
-  partnerVideoRef.current
-    .play()
-    .catch(console.error);
-
-  console.log("PARTNER VIDEO ASSIGNED");
-}
-});
+      console.log("PARTNER VIDEO ASSIGNED");
+    }
+  });
 
   peer.on("signal", (signal) => {
-  console.log(
-    "ADD PEER SIGNAL:",
-    signal.type
-  );
+    console.log(
+      "ANSWER SIGNAL FIRED"
+    );
 
-  socket.emit("returning-signal", {
-    signal,
-    callerId,
+    console.log(signal);
+
+    socket.emit("returning-signal", {
+      signal,
+      callerId,
+    });
   });
-});
 
-    peer.on("connect", () => {
-      console.log("PEER CONNECTED");
-    });
+  peer.on("connect", () => {
+    console.log("PEER CONNECTED");
+  });
 
-    peer.on("error", (err) => {
-      console.error(
-        "PEER ERROR:",
-        err
-      );
-    });
+  peer.on("error", (err) => {
+    console.error(
+      "PEER ERROR:",
+      err
+    );
+  });
 
-    peer.on("close", () => {
-  console.log("PEER CLOSED");
+  peer.on("close", () => {
+    console.log("PEER CLOSED");
 
-  if (peerRef.current === peer) {
-    peerRef.current = null;
-  }
-});
+    if (peerRef.current === peer) {
+      peerRef.current = null;
+    }
+  });
 
-    peer.signal(incomingSignal);
+  console.log("APPLYING OFFER");
 
-    return peer;
-  }
+  peer.signal(incomingSignal);
+
+  return peer;
+}
 
   const shareScreen = async () => {
     try {
