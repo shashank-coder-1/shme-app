@@ -69,16 +69,15 @@ export default function useWebRTC(roomId: string) {
 
   if (users.length === 0) return;
 
-  if (peerRef.current) {
-    console.log("Peer already exists");
-    return;
-  }
+  console.log("CREATING INITIATOR");
 
   const peer = createPeer(
     users[0],
     socket.id!,
     stream
   );
+
+  console.log("PEER CREATED");
 
   peerRef.current = peer;
 });
@@ -151,6 +150,8 @@ export default function useWebRTC(roomId: string) {
     start();
 
     return () => {
+  console.log("HOOK CLEANUP");
+
   socket.off("all-users");
   socket.off("user-joined");
   socket.off("receiving-signal");
@@ -270,6 +271,8 @@ export default function useWebRTC(roomId: string) {
     peerRef.current = null;
   }
 });
+
+console.log("CREATE PEER FUNCTION FINISHED");
 
     return peer;
   }
