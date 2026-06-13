@@ -22,6 +22,20 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "SHME",
   },
+
+  openGraph: {
+    title: "SHME",
+    description: "Watch Movies Together",
+    images: ["/og-image.png"],
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "SHME",
+    description: "Watch Movies Together",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
