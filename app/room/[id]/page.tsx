@@ -89,11 +89,22 @@ useEffect(() => {
     handleResize
   );
 
-  return () =>
+  window.addEventListener(
+    "orientationchange",
+    handleResize
+  );
+
+  return () => {
     window.removeEventListener(
       "resize",
       handleResize
     );
+
+    window.removeEventListener(
+      "orientationchange",
+      handleResize
+    );
+  };
 }, []);
 
   const toggleFullscreen = async () => {
@@ -140,7 +151,7 @@ useEffect(() => {
 };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-[100dvh] overflow-hidden">
 
       {/* Background Video */}
       <video
@@ -174,19 +185,19 @@ useEffect(() => {
       />
 
       <div
-  className="
-    relative
-    min-h-screen
-    flex
-    flex-col
-    items-center
-    justify-center
-    text-white
-    p-3
-    md:p-6
-    space-y-6
-  "
->
+      className="
+      relative
+      min-h-[100dvh]
+      flex
+      flex-col
+      items-center
+      justify-center
+      text-white
+      p-3
+      md:p-6
+      space-y-6
+      "
+      >
     {copied && (
     <div
       className="
@@ -220,7 +231,7 @@ useEffect(() => {
 
   ${
     isLandscape
-      ? "w-screen h-screen rounded-none"
+      ? "w-screen h-[100dvh] rounded-none"
       : "w-[95vw] max-w-[1400px] h-[65vh] md:h-[800px] rounded-[24px] md:rounded-[40px]"
   }
 `}
