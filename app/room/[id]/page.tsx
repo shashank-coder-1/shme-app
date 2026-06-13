@@ -35,10 +35,16 @@ export default function RoomPage() {
   const [isLandscape, setIsLandscape] =
   useState(false);
 
-  const isIOS =
-  /iPhone|iPad|iPod/.test(
-    navigator.userAgent
+  const [isIOS, setIsIOS] =
+  useState(false);
+
+useEffect(() => {
+  setIsIOS(
+    /iPhone|iPad|iPod/.test(
+      navigator.userAgent
+    )
   );
+}, []);
 
   const {
     localVideoRef,

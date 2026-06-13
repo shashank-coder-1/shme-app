@@ -4,6 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import Peer from "simple-peer";
 import { socket } from "@/app/lib/socket";
 
+const ICE_SERVERS = [
+  {
+    urls: "stun:stun.l.google.com:19302",
+  },
+  {
+    urls: [
+      "turn:167.233.115.150:3478?transport=udp",
+      "turn:167.233.115.150:3478?transport=tcp",
+    ],
+    username: "shme",
+    credential: "Shme@2026Turn!",
+  },
+];
+
 export default function useWebRTC(roomId: string) {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const mainScreenRef = useRef<HTMLVideoElement>(null);
@@ -161,15 +175,23 @@ export default function useWebRTC(roomId: string) {
   initiator: true,
   trickle: false,
   stream,
-  config: {
-    iceServers: [
-      {
-        urls:
-          "stun:stun.l.google.com:19302",
-      },
-    ],
-  },
-});
+
+    config: {
+      iceServers: ICE_SERVERS,
+    },
+  });
+
+(peer as any)._pc.onicecandidate = (
+  event: any
+) => {
+  if (event.candidate) {
+    console.log(
+      "ICE CANDIDATE:",
+      event.candidate.type
+    );
+  }
+};
+
 (peer as any)._initiator = true;
 
 (peer as any)._pc.oniceconnectionstatechange =
@@ -261,15 +283,23 @@ export default function useWebRTC(roomId: string) {
   initiator: false,
   trickle: false,
   stream,
+   
   config: {
-    iceServers: [
-      {
-        urls:
-          "stun:stun.l.google.com:19302",
-      },
-    ],
-  },
-});
+      iceServers: ICE_SERVERS,
+    },
+  });
+
+(peer as any)._pc.onicecandidate = (
+  event: any
+) => {
+  if (event.candidate) {
+    console.log(
+      "ICE CANDIDATE:",
+      event.candidate.type
+    );
+  }
+};
+
 (peer as any)._initiator = false;
 
 (peer as any)._pc.oniceconnectionstatechange =
